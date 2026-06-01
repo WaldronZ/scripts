@@ -1,6 +1,6 @@
 # scripts
 
-Personal utility scripts. The main script in this repository is
+Utility scripts. The main script in this repository is
 `setup_ssh_key.sh`, a small macOS-friendly SSH helper for:
 
 - creating or updating `~/.ssh/config` Host entries
