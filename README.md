@@ -1,6 +1,12 @@
 # scripts
 
-Utility scripts. The main script in this repository is
+Utility scripts.
+
+- `claude-code/` — 在多个 Anthropic 兼容供应商间切换运行 Claude Code 的模型
+  profile 选择菜单（裸 `claude` 弹出菜单）。见 [`claude-code/README.md`](claude-code/README.md)。
+- `setup_ssh_key.sh` — 下述 SSH 助手。
+
+The main SSH script in this repository is
 `setup_ssh_key.sh`, a small macOS-friendly SSH helper for:
 
 - creating or updating `~/.ssh/config` Host entries
