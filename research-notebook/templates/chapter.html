@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 {{N}} 章 · {{章节标题}} — {{项目名}}研究笔记本</title>
+<style>
+  /* ============ 设计令牌（所有页面一致，勿改） ============ */
+  :root {
+    --c-main: #b45309;
+    --c-s1: #2563eb;
+    --c-s2: #7c3aed;
+    --c-s3: #059669;
+    --c-s4: #dc2626;
+    --bg: #f8fafc; --card: #ffffff; --ink: #1e293b; --ink2: #64748b; --line: #e2e8f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+         background: var(--bg); color: var(--ink); line-height: 1.75; }
+  /* 宽表页（实验台账等）把下行 1080px 改为 1180px */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* ============ 页首：返回导航 + 标题（固定结构） ============ */
+  .topnav { margin-bottom: 22px; font-size: 13.5px; }
+  .topnav a { color: var(--c-s1); text-decoration: none; font-weight: 600; }
+  .topnav a:hover { text-decoration: underline; }
+  .topnav .crumb { color: var(--ink2); margin-left: 10px; }
+  header { margin-bottom: 26px; }
+  header h1 { font-size: 26px; }
+  header .sub { color: var(--ink2); margin-top: 8px; font-size: 14px; }
+
+  /* ============ 本章摘要（每章必有，琥珀渐变框） ============ */
+  .chsummary { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fde68a;
+               border-radius: 12px; padding: 18px 22px; margin-bottom: 30px; font-size: 14px; }
+  .chsummary h2 { font-size: 15px; color: #92400e; margin-bottom: 8px; }
+  .chsummary ul { list-style: none; }
+  .chsummary li { padding: 3px 0 3px 20px; position: relative; }
+  .chsummary li::before { content: "▸"; position: absolute; left: 2px; color: #92400e; }
+
+  /* ============ 节标题（左色条 s1蓝→s2紫→s3绿→s4红 循环） ============ */
+  h2.sec { font-size: 19px; margin: 42px 0 6px; padding-left: 12px; }
+  h2.sec.s1 { border-left: 5px solid var(--c-s1); }
+  h2.sec.s2 { border-left: 5px solid var(--c-s2); }
+  h2.sec.s3 { border-left: 5px solid var(--c-s3); }
+  h2.sec.s4 { border-left: 5px solid var(--c-s4); }
+  .secdesc { color: var(--ink2); font-size: 14px; margin: 0 0 18px 13px; }
+
+  /* ============ 卡片与表格 ============ */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+          padding: 20px 26px; margin-bottom: 20px; font-size: 14px; }
+  .card h3 { font-size: 16px; margin-bottom: 10px; }
+  .card p { margin-bottom: 10px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 10px 22px; }
+  .card li { padding: 2px 0; }
+  table.kv { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+  table.kv th, table.kv td { padding: 7px 10px; border-bottom: 1px solid var(--line);
+                             text-align: left; vertical-align: top; }
+  table.kv th { background: #f8fafc; color: var(--ink2); font-weight: 600; }
+  table.kv td code, td code { background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+  /* 台账宽表：复现对照行黄底 / 分组隔行灰底 / 最优行绿底 */
+  tr.repro td { background: #fffbeb; }
+  tr.repro td:first-child { font-weight: 700; color: #92400e; }
+  tr.grp td { background: #f1f5f9; color: var(--ink2); font-weight: 600; font-size: 11.5px; padding: 4px 9px; }
+  tr.best td { background: #f0fdf4; }
+  td.score { font-weight: 700; }
+
+  /* ============ 流程链（≤6 节点的简单流程；复杂流程用 SVG） ============ */
+  .flow { display: flex; align-items: stretch; gap: 8px; margin: 14px 0; flex-wrap: wrap; }
+  .flow .node { flex: 1; min-width: 138px; border-radius: 8px; padding: 10px 12px; font-size: 12.5px;
+                border: 1px solid var(--line); background: #f8fafc; }
+  .flow .node b { display: block; font-size: 13px; margin-bottom: 3px; }
+  .flow .n1 { border-top: 3px solid var(--c-s1); }
+  .flow .n2 { border-top: 3px solid var(--c-s2); }
+  .flow .n3 { border-top: 3px solid var(--c-s3); }
+  .flow .n4 { border-top: 3px solid var(--c-s4); }
+  .flow .arrow { align-self: center; color: var(--ink2); font-weight: 700; }
+
+  /* ============ 警示/结论框 + 可折叠决策记录 ============ */
+  .callout { border-left: 4px solid var(--c-main); background: #fffbeb; padding: 10px 16px;
+             border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 13.5px; }
+  .callout.blue { border-color: var(--c-s1); background: #eff6ff; }
+  .callout.green { border-color: var(--c-s3); background: #ecfdf5; }
+  .callout.red { border-color: var(--c-s4); background: #fef2f2; }
+  details.fld { border-left: 4px solid var(--c-main); background: #fffbeb; padding: 8px 16px;
+                border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 13.5px; }
+  details.fld.blue { border-color: var(--c-s1); background: #eff6ff; }
+  details.fld.green { border-color: var(--c-s3); background: #ecfdf5; }
+  details.fld summary { cursor: pointer; font-weight: 700; color: var(--ink); list-style: none; }
+  details.fld summary::-webkit-details-marker { display: none; }
+  details.fld summary::before { content: "▸ "; color: var(--ink2); }
+  details.fld[open] summary::before { content: "▾ "; }
+
+  /* ============ 徽章与小标签 ============ */
+  .pill { display: inline-block; font-size: 11px; border-radius: 999px; padding: 1px 10px;
+          background: #fef2f2; color: #b91c1c; margin-right: 4px; font-weight: 600; }
+  .pill.blue { background: #eff6ff; color: #1d4ed8; }
+  .ibadge { display: inline-block; background: var(--c-s2); color: #fff; border-radius: 8px;
+            padding: 2px 12px; font-size: 13px; font-weight: 700; margin-right: 8px; }
+  .ibadge.g { background: var(--c-s3); }
+  .ibadge.b { background: var(--c-s1); }
+  .ibadge.r { background: var(--c-s4); }
+  .tag { display: inline-block; font-size: 11px; border-radius: 4px; padding: 1px 8px;
+         margin-right: 4px; white-space: nowrap; }
+  .tag.pos { background: #dcfce7; color: #15803d; }
+  .tag.neg { background: #fee2e2; color: #b91c1c; }
+  .tag.mid { background: #fef3c7; color: #92400e; }
+  .tag.no  { background: #f1f5f9; color: #94a3b8; }
+  /* 实验状态徽章（台账页用） */
+  .st { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px;
+        padding: 2px 10px; white-space: nowrap; }
+  .st.planned   { background: #f1f5f9; color: #64748b; }
+  .st.submitted { background: #dbeafe; color: #1d4ed8; }
+  .st.running   { background: #fef9c3; color: #a16207; }
+  .st.done      { background: #d1fae5; color: #047857; }
+  .st.failed    { background: #fee2e2; color: #b91c1c; }
+
+  /* ============ 公式与代码 ============ */
+  .formula { background: #f8fafc; border: 1px solid var(--line); border-radius: 8px;
+             padding: 12px 18px; margin: 12px 0; font-family: "SF Mono", Menlo, monospace;
+             font-size: 13px; overflow-x: auto; white-space: nowrap; }
+  .formula .tag { color: var(--ink2); font-size: 12px; }
+  pre.codebox { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 12px 14px;
+                font-size: 11.5px; line-height: 1.65; overflow-x: auto; white-space: pre-wrap;
+                word-break: break-word; margin: 8px 0 4px;
+                font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre.codebox .hl { color: #7dd3fc; font-weight: 700; }
+
+  /* ============ 分数条形图（benchmark 页用） ============ */
+  .score { background: #f1f5f9; border-radius: 8px; padding: 12px 16px; font-size: 13.5px;
+           margin-bottom: 16px; }
+  .score .bar-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+  .score .lbl { width: 150px; flex: none; color: var(--ink2); }
+  .score .track { flex: 1; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
+  .score .fill { height: 100%; border-radius: 5px; }
+  .score .fill.agent { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+  .score .fill.base  { background: #94a3b8; }
+  .score .val { width: 52px; text-align: right; font-weight: 600; flex: none; }
+  .delta { color: #059669; font-weight: 700; }
+
+  /* ============ 样例框（benchmark 题例/案例分析用） ============ */
+  .sample { border: 1px dashed #cbd5e1; border-radius: 8px; padding: 14px 18px;
+            background: #fffdf5; font-size: 13.5px; }
+  .sample .tag { display: inline-block; font-size: 11px; background: #fef3c7; color: #92400e;
+                 border-radius: 4px; padding: 1px 8px; margin-bottom: 8px; }
+  .sample .q { font-weight: 600; margin-bottom: 6px; }
+  .sample .opts { margin: 4px 0 8px 0; }
+  .sample .opts div { padding: 1px 0; }
+  .sample .opts .ans { color: #059669; font-weight: 700; }
+  .sample .note { color: var(--ink2); font-size: 12.5px; margin-top: 8px; }
+
+  /* ============ SVG 图容器与图题 ============ */
+  .svgbox { background: #fff; border: 1px solid var(--line); border-radius: 12px;
+            padding: 14px 8px 4px; margin: 14px 0 4px; overflow-x: auto; }
+  .figcap { font-size: 12.5px; color: var(--ink2); text-align: center; margin: 2px 0 18px; }
+
+  /* ============ 页脚（固定结构） ============ */
+  footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line);
+           color: var(--ink2); font-size: 12.5px; }
+  footer a { color: var(--c-s1); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="topnav">
+  <a href="index.html">← 返回目录</a>
+  <span class="crumb">{{项目名}} 研究笔记本 / 第 {{N}} 章 · {{章节标题}}</span>
+</nav>
+
+<header>
+  <h1>第 {{N}} 章 · {{章节标题}}</h1>
+  <div class="sub">{{出处行：基于什么材料（论文 §/repo commit/实测 EXP 范围）、本章覆盖什么}}</div>
+</header>
+
+<!-- 本章摘要：每章必有；自足、数字密集，不读正文也能掌握本章结论 -->
+<div class="chsummary">
+  <h2>本章摘要</h2>
+  <ul>
+    <li><b>{{结论一主题}}：</b>{{一句话结论，带关键数字（n / Δ / p 值 / 耗时）}}。</li>
+    <li><b>{{结论二主题}}：</b>{{一句话结论}}。</li>
+  </ul>
+</div>
+
+<!-- 可选：大章（>5 节）配本章导读表 -->
+<div class="card">
+  <h3>本章导读</h3>
+  <table class="kv">
+    <tr><th style="width:10%">节</th><th style="width:38%">内容</th><th>回答的问题</th></tr>
+    <tr><td>§{{N}}.1</td><td>{{本节内容一句话}}</td><td>{{本节回答什么问题}}</td></tr>
+  </table>
+</div>
+
+<!-- ============ 正文：节标题色条按 s1→s2→s3→s4 循环 ============ -->
+<h2 class="sec s1">{{N}}.1 {{第一节标题}}</h2>
+<p class="secdesc">{{出处：论文 §x.x / 代码路径 / EXP 编号}}</p>
+
+<div class="card">
+  <h3>{{卡片标题}}</h3>
+  <p>{{正文段落。每个 claim 带锚点：论文 §/页码、代码 <code>file:line</code>、实验 EXP-xxx。}}</p>
+  <table class="kv">
+    <tr><th style="width:140px">{{键列}}</th><th>{{值列}}</th></tr>
+    <tr><td>{{键}}</td><td>{{值，代码用 <code>…</code>}}</td></tr>
+  </table>
+  <div class="callout"><b>{{要点}}：</b>{{关键结论 / 口径警告 / 客观性说明（默认琥珀；变体 .blue/.red/.green）。}}</div>
+</div>
+
+<!-- 简单流程（≤6 节点）用流程链；复杂框架用下面的 SVG -->
+<div class="flow">
+  <div class="node n1"><b>① {{步骤}}</b>{{说明}}</div>
+  <span class="arrow">→</span>
+  <div class="node n2"><b>② {{步骤}}</b>{{说明}}</div>
+  <span class="arrow">→</span>
+  <div class="node n3"><b>③ {{步骤}}</b>{{说明}}</div>
+  <span class="arrow">→</span>
+  <div class="node n4"><b>④ {{步骤}}</b>{{说明}}</div>
+</div>
+
+<h2 class="sec s2">{{N}}.2 {{第二节标题}}</h2>
+<p class="secdesc">{{出处}}</p>
+
+<!-- 公式块：等宽、行尾 tag 标出处 -->
+<div class="card">
+  <div class="formula">y = f(x<sub>k</sub>) <span class="tag">// Eq.1：公式含义 / 出处</span></div>
+</div>
+
+<!-- 深色代码/JSON 块，关键片段 hl 高亮 -->
+<pre class="codebox">{"observation": "…", "action": <span class="hl">{"type": "…"}</span>}</pre>
+
+<!-- 分数条形图：agent=琥珀→红渐变（我们的方法），base=灰（基线） -->
+<div class="card">
+  <div class="score">
+    <div class="bar-row"><span class="lbl">{{方法A}}</span><div class="track"><div class="fill agent" style="width:67.8%"></div></div><span class="val">67.8</span></div>
+    <div class="bar-row"><span class="lbl">{{基线B}}</span><div class="track"><div class="fill base" style="width:64.8%"></div></div><span class="val">64.8</span></div>
+    <div style="margin-top:4px">Δ <span class="delta">+3.0</span>（{{参照系补充说明}}）</div>
+  </div>
+  <div class="sample">
+    <span class="tag">{{样例来源：论文附录原样例 / 示意样例（按数据集格式构造）}}</span>
+    <div class="q">Q：{{题干}}</div>
+    <div class="opts">
+      <div>(A) {{选项}}</div>
+      <div class="ans">(B) {{正确选项}} ✓</div>
+    </div>
+    <div class="note">{{考点解读 / agent 轨迹复盘}}</div>
+  </div>
+</div>
+
+<h2 class="sec s3">{{N}}.3 {{含框架图的节标题}}</h2>
+<p class="secdesc">{{出处}}</p>
+
+<!-- SVG 框架图示例：六色体系 + 红虚线负向路径 + 红色局限徽章；画布 1040 宽 -->
+<div class="svgbox">
+<svg viewBox="0 0 1040 280" width="100%" style="min-width:900px" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
+  <defs>
+    <marker id="mA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b45309"/></marker>
+    <marker id="mB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+    <marker id="mG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+    <marker id="mP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker>
+    <marker id="mR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+    <marker id="mS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+  </defs>
+
+  <!-- 组件框：浅底+同色描边；标题 15px/700 同色；正文 12px #334155 -->
+  <rect x="30" y="60" width="300" height="120" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.5"/>
+  <text x="48" y="88" font-size="15" font-weight="700" fill="#b45309">{{组件 A}}</text>
+  <text x="48" y="112" font-size="12" fill="#334155">{{说明第一行}}</text>
+  <text x="48" y="134" font-size="12" fill="#334155">{{说明第二行}}</text>
+
+  <!-- 连接箭头 + 流向标签 -->
+  <line x1="330" y1="120" x2="416" y2="120" stroke="#64748b" stroke-width="1.6" marker-end="url(#mS)"/>
+  <text x="373" y="108" font-size="11" fill="#64748b" text-anchor="middle">{{数据流}}</text>
+
+  <rect x="420" y="60" width="300" height="120" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="438" y="88" font-size="15" font-weight="700" fill="#2563eb">{{组件 B}}</text>
+  <text x="438" y="112" font-size="12" fill="#334155">{{说明}}</text>
+
+  <!-- 红色虚线 = 焚毁/负向/问题路径 -->
+  <path d="M570,180 C620,220 700,230 780,220" fill="none" stroke="#dc2626" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#mR)"/>
+  <text x="640" y="246" font-size="10.5" fill="#dc2626">{{负向路径说明}}</text>
+
+  <!-- 红色圆形徽章：把局限/问题编号钉在组件上 -->
+  <circle cx="30" cy="60" r="14" fill="#dc2626"/><text x="30" y="64" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">L1</text>
+
+  <!-- 图例 -->
+  <circle cx="800" cy="100" r="12" fill="#dc2626"/>
+  <text x="800" y="104" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">Ln</text>
+  <text x="822" y="105" font-size="11.5" fill="#64748b">= 局限编号，对应正文清单表</text>
+</svg>
+</div>
+<p class="figcap">图 1 · {{图题：一句话说清这张图怎么看}}。</p>
+
+<!-- 位图（论文原图/截图）：base64 内嵌，保持单文件自包含。
+     生成：base64 -i figure.jpg | tr -d '\n'
+     压缩：sips -Z 1400 -s format jpeg -s formatOptions 70 in.png --out fig.jpg -->
+<div class="card">
+  <h3>{{图题}}</h3>
+  <p style="font-size:13px;color:#64748b;margin:4px 0 6px"><b>{{出处，如：论文 Figure 1 原图（arXiv:xxxx 第 2 页）}}</b>：{{这张图讲了什么}}。</p>
+  <img src="data:image/jpeg;base64,{{BASE64}}" style="max-width:100%">
+  <p style="margin-top:8px">{{我们的解读}}</p>
+</div>
+
+<!-- 长决策记录 / 诘问固化：默认折叠，保持正文流干净 -->
+<details class="fld"><summary>{{折叠块标题：什么决策/什么问题，定稿日期}}</summary>{{完整决策过程、理由、备选项、诚实注脚。}}</details>
+
+<h2 class="sec s4">{{N}}.4 {{实验台账节（仅台账页需要，否则整节删除）}}</h2>
+<p class="secdesc">每次运行一行，倒序追加（最新在上）；提交后立即登记 task_id，终态后回填结果</p>
+
+<div class="card" style="overflow-x:auto">
+<table class="kv">
+  <tr><th>时间</th><th>ID</th><th>内容</th><th>task_id / logview</th><th>状态</th><th>结果 / 产物</th></tr>
+  <tr>
+    <td>{{MM-DD HH:MM}}</td><td>EXP-001</td>
+    <td>{{做了什么：数据集/参数/权重版本；结论先行，数字密集}}</td>
+    <td><code>{{task_id}}</code><br><a href="{{logview_url}}">logview</a></td>
+    <td><span class="st done">done</span></td>
+    <!-- 状态可选：planned / submitted / running / done / failed -->
+    <td>{{分数/结论}}；产物 <code>{{路径}}</code></td>
+  </tr>
+</table>
+<div class="callout"><b>登记模板：</b>时间 · ID（EXP-xxx）· 内容（数据集/参数/权重版本）· task_id + logview 链接 · 状态 · 结果（summary 路径 / 分数 / 与目标差值）。集群任务提交后立即登记 task_id；终态后回填结果。</div>
+</div>
+
+<footer>
+  <p style="margin-bottom:10px"><a href="index.html">← 返回目录（{{项目名}} 研究笔记本）</a></p>
+  <p><b>出处：</b>{{本章依据的材料与版本}}。</p>
+  <p>第 {{N}} 章 · 更新日期：{{YYYY-MM-DD}}</p>
+</footer>
+
+</div>
+</body>
+</html>

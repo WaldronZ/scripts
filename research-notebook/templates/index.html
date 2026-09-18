@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{项目名}} 研究笔记本</title>
+<style>
+  :root {
+    --c-main: #b45309;
+    --c-video: #2563eb;
+    --c-av: #7c3aed;
+    --c-tg: #059669;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --ink: #1e293b;
+    --ink2: #64748b;
+    --line: #e2e8f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+         background: var(--bg); color: var(--ink); line-height: 1.7; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  header { margin-bottom: 30px; }
+  header .kicker { font-size: 13px; color: var(--c-main); font-weight: 700; letter-spacing: 2px; }
+  header h1 { font-size: 30px; margin-top: 4px; }
+  header .sub { color: var(--ink2); margin-top: 8px; font-size: 14px; }
+  header .sub a { color: var(--c-video); text-decoration: none; }
+
+  .glance { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+            padding: 22px 26px; margin-bottom: 40px; }
+  .vision { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #f59e0b55;
+            border-left: 5px solid var(--c-main); border-radius: 12px;
+            padding: 20px 26px; margin-bottom: 24px; }
+  .vision h2 { font-size: 16px; margin-bottom: 10px; color: var(--c-main); }
+  .vision .vcore { font-size: 14.5px; }
+  .vision ol { margin: 8px 0 10px 22px; font-size: 14px; }
+  .vision li { padding: 3px 0; }
+  .vision .vroute { font-size: 13px; color: var(--ink2); border-top: 1px dashed #f59e0b66;
+                    padding-top: 10px; }
+  .glance h2 { font-size: 16px; margin-bottom: 12px; color: var(--c-main); }
+  .glance ul { list-style: none; font-size: 14px; }
+  .glance li { padding: 5px 0 5px 22px; position: relative; }
+  .glance li::before { content: "▸"; position: absolute; left: 2px; color: var(--c-main); }
+  .glance b { color: var(--ink); }
+  .assets { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 12px; padding-top: 12px;
+            border-top: 1px dashed var(--line); font-size: 12.5px; color: var(--ink2); }
+  .assets code { background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+  .toc-title { font-size: 20px; margin: 0 0 16px 2px; }
+  .chapter { display: block; background: var(--card); border: 1px solid var(--line);
+             border-radius: 12px; padding: 20px 24px; margin-bottom: 16px;
+             text-decoration: none; color: inherit; transition: all .15s ease; }
+  .chapter:hover { border-color: var(--c-main); box-shadow: 0 4px 14px rgba(180,83,9,.10);
+                   transform: translateY(-1px); }
+  .chapter .num { font-size: 12px; font-weight: 700; color: var(--c-main); letter-spacing: 1px; }
+  .chapter h3 { font-size: 17px; margin: 4px 0 8px; display: flex; align-items: center; gap: 10px; }
+  .chapter h3 .go { font-size: 13px; color: var(--ink2); font-weight: 400; }
+  .chapter:hover h3 .go { color: var(--c-main); }
+  .chapter .sum { font-size: 13.5px; color: var(--ink2); }
+  .chapter .tags { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chapter .tags span { font-size: 11px; background: #f1f5f9; color: #475569;
+                        border-radius: 4px; padding: 2px 8px; }
+
+  .chapter.soon { opacity: .55; cursor: default; border-style: dashed; }
+  .chapter.soon:hover { box-shadow: none; transform: none; border-color: var(--line); }
+
+  footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line);
+           color: var(--ink2); font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">RESEARCH NOTEBOOK</div>
+  <h1>{{项目名}} 研究笔记本</h1>
+  <div class="sub">
+    <i>{{论文英文名}}</i> ·
+    <a href="{{arXiv 链接}}">arXiv:{{编号}}</a>（{{会议/年份}}）·
+    <a href="{{代码仓库链接}}">代码</a> ·
+    本地 <code>{{本地路径}}</code>
+  </div>
+</header>
+
+<!-- 研究愿景框：项目为什么做、做到什么程度算成 -->
+<div class="vision">
+  <h2>🎯 研究愿景（定稿 {{YYYY-MM-DD}}）</h2>
+  <p class="vcore">一句话愿景：<b>{{核心目标}}</b>：</p>
+  <ol>
+    <li><b>{{目标一}}</b> —— {{展开说明}}；</li>
+    <li><b>{{目标二}}</b> —— {{展开说明}}。</li>
+  </ol>
+  <p class="vroute"><b>路线：</b>{{阶段一}} → {{阶段二}} → {{阶段三}}（每一步以 benchmark 分数与实验台账为准绳）。</p>
+</div>
+
+<!-- 项目一页知：核心思想/关键结果的速览 + 资源清单 -->
+<div class="glance">
+  <h2>项目一页知</h2>
+  <ul>
+    <li><b>核心思想：</b>{{一段话讲清方法或研究对象}}。</li>
+    <li><b>关键结果：</b>{{最重要的数字结论}}。</li>
+  </ul>
+  <div class="assets">
+    <span>📄 <code>{{论文文件}}</code></span>
+    <span>💻 <code>{{代码目录}}</code>（{{commit}}）</span>
+    <span>🧠 权重/数据：<code>{{路径}}</code></span>
+  </div>
+</div>
+
+<h2 class="toc-title">章节目录</h2>
+
+<!-- 每章登记一张卡片；规划中的章节用 class="chapter soon" 且去掉 href -->
+<a class="chapter" href="{{chapter_file}}.html">
+  <div class="num">第 1 章</div>
+  <h3>{{章节标题}} <span class="go">点击进入 →</span></h3>
+  <div class="sum">{{本章内容摘要：覆盖什么、回答什么问题，数字密集}}</div>
+  <div class="tags">
+    <span>{{关键数字/结论 1}}</span><span>{{关键数字/结论 2}}</span><span>{{关键词}}</span>
+  </div>
+</a>
+
+<a class="chapter soon">
+  <div class="num">第 2 章</div>
+  <h3>{{规划中章节标题}}</h3>
+  <div class="sum">{{计划内容}}</div>
+  <div class="tags"><span>规划中</span></div>
+</a>
+
+<footer>
+  <p><b>维护约定：</b>新增内容 = 新增一章独立 HTML（页首带「本章摘要」+ 返回目录链接），并在本页目录登记卡片。</p>
+  <p>更新日期：{{YYYY-MM-DD}} · 统一入口：{{项目目录}}/index.html</p>
+</footer>
+
+</div>
+</body>
+</html>
