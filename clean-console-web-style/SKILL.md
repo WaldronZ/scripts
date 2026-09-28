@@ -35,7 +35,7 @@ description: 生成通用测试数据网站、模型评测页、对话式调试�
   --assistant-bubble: #eef1f6; /* 助手气泡/次按钮/chip 底 */
 }
 
-html, body { height: 100%; overflow: hidden; }   /* 滚动只发生在面板内部 */
+html, body { height: 100%; overflow: hidden; }   /* 滚动只发生在面板区域 */
 body {
   font-family: -apple-system, "Segoe UI", "PingFang SC", Roboto, sans-serif;
   color: var(--text); background: var(--bg);
@@ -67,7 +67,7 @@ body {
   - `.top-tabs`：`position:absolute; left:50%; transform:translateX(-50%)`，页签整体居中，高 100%、gap 4px
   - `.top-tab`：透明底、muted、14px/600、`padding:0 16px`、`border-bottom:3px solid transparent`、圆角 0；hover 和 active 都是：底 `#f5f7fb` + 字 accent + 底边条 accent
   - `.top-user`：`margin-left:auto`，14px muted 用户名 + link-btn "退出"
-- **页面容器 `.app-page`**：`flex:1; min-height:0`，chat/eval 页内部再 `display:flex`（侧边栏 + 主区）
+- **页面容器 `.app-page`**：`flex:1; min-height:0`，chat/eval 页内再 `display:flex`（侧边栏 + 主区）
 - **侧边栏 `.sidebar`**：`width:350px; flex-shrink:0; padding:20px; gap:16px`，白底 + 右描边，纵向 flex、`overflow-y:auto`；内容顺序固定：
   1. 主操作按钮（"+ 新建会话 / + 新建盲评"，默认主按钮样式）
   2. `fieldset.scene-group`（描边 8px 圆角，legend 12px muted）包一组 `.scene-tab`
@@ -207,7 +207,7 @@ button.secondary:hover { background:#e2e6ee; }
 
 ### 4.5 场景页签 / chip / 示例
 - `.scene-tab`：`flex:1 1 28%`（一行约 3 个自动换行）、白底描边、13px muted、`padding:7px 4px`；hover 边变 accent；active 实色 accent + 600
-- `.model-chip`：`#eef1f6` 底、999px、`padding:5px 12px`、13px；selected 实色 accent；内部 checkbox `display:none`
+- `.model-chip`：`#eef1f6` 底、999px、`padding:5px 12px`、13px；selected 实色 accent；复选框 `display:none`
 - `.example-chip`：白底描边 999px、12px muted、单行省略；hover 边/字变 accent、底 `#f5f8ff`
 
 ### 4.6 对话气泡与消息区
@@ -256,7 +256,7 @@ button.secondary:hover { background:#e2e6ee; }
 - **textarea 自动增高**：`input` 事件里 `el.style.height="auto"; el.style.height=Math.min(el.scrollHeight,160)+"px"`
 - **发送键**：`keydown` 里 `Enter && !shiftKey` → preventDefault + 提交；发送中按钮变 `.stop`（红底"停止"）
 - **流式渲染**：fetch + ReadableStream 逐 chunk 追加，末尾挂 `.cursor` 闪烁块，结束移除；`messages.scrollTop = scrollHeight` 自动滚底
-- **Markdown**：marked 渲染 → DOMPurify 消毒 → KaTeX 公式（原站用 `/vendor/marked.min.js + purify.min.js + katex.min.js`）
+- **Markdown**：marked 渲染 → DOMPurify 消毒 → KaTeX 公式（参考实现使用 `/vendor/marked.min.js + purify.min.js + katex.min.js`）
 - **参数校验**：如最大生成长度 16–4096，越界即加 `.invalid` + `.field-error` 文案并禁用发送
 - **评价流**：四个评分按钮互斥 toggle；未评完当前轮点"揭示模型"时显示 `.eval-rating-hint` 红字；全部评完提交后渲染 `.eval-reveal-summary` sticky 绿条 + 每卡头部 `.eval-reveal` 显示真实模型名
 - **删除**：全部走 `confirm()` 原生确认，无自定义弹窗
