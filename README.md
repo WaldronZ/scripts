@@ -10,6 +10,7 @@
 | [`ssh/`](ssh/README.md) | macOS SSH 助手：管理 `~/.ssh/config`、`ssh-copy-id` 装公钥、`ProxyJump` 跳板机菜单 | `ssh` 弹出 Host 菜单 |
 | [`remote-lab-workflow/`](remote-lab-workflow/README.md) | 「本地优先 + 远程实验」工作流的 Claude Code 模板：强制实验日志、git 风险分层、rsync 同步 / ssh -tt 远程执行 / 结果拉回本地分析 | 拷入项目作 `CLAUDE.md` |
 | [`research-notebook/`](research-notebook/README.md) | 单文件 HTML 研究笔记本的 agent skill：index 目录页 + 每章一页，内联设计系统、手写 SVG 框架图、base64 位图、实验台账约定 | 拷入 `~/.agents/skills/` |
+| [`clean-console-web-style/`](clean-console-web-style/README.md) | Trismind-AI 内部工具 / RAG 评测页的清爽控制台样式 skill，作为测试样式设计参考 | 拷入项目的 skills 目录 |
 
 ## 思路
 
